@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.BasketDao">
+  
+  <resultMap type="basket" id="BasketMap">
+    <id column="bkno"           property="basketNo"/>
+    <result column="amount"  property="amount"/>
+    
+    <association property="product" javaType="product">
+      <id column="product_no"    property="productNo"/>
+      <result column="product_title"    property="title"/>
+      <result column="product_content"    property="content"/>
+      <result column="product_price"    property="price"/>
+      <result column="product_photo"    property="photo"/>
+    </association>
+    
+    <association property="writer" javaType="user">
+      <id column="writer_no"        property="userNo"/>
+      <result column="writer_name"  property="name"/>
+    </association>
+  </resultMap>
+
+  <select id="findAll" resultMap="BasketMap" parameterType="string">
+    select 
+      b.bkno,
+      u.uno writer_no,
+      u.nick writer_nick, 
+      p.pno product_no, 
+      p.title product_title,
+      p.content product_content,
+      p.price product_price,
+      p.photo product_photo,
+      b.amount 
+    from
+      oi_basket b
+      inner join oi_product p
+        on b.pno=p.pno
+      inner join oi_user u 
+         on b.uno=u.uno
+      where b.uno = #{writer.userNo}
+  </select>
+
+  <select id="findByUserNo" resultMap="BasketMap" parameterType="int">
+    select 
+      b.bkno,
+      u.uno writer_no,
+      u.name writer_name, 
+      p.pno product_no,
+      p.title product_title, 
+      p.content product_content,
+      p.price product_price,
+      p.photo product_photo,
+      b.amount 
+    from
+      oi_basket b
+      inner join oi_product p
+        on b.pno=p.pno
+      inner join oi_user u 
+         on b.uno=u.uno
+    where b.uno = #{userNo}
+  </select>
+  
+  <select id="findByNo" resultMap="BasketMap" parameterType="int">
+    select
+      bkno,
+      pno,
+      amount
+    from
+      oi_basket
+    where
+      uno=#{uno}
+  </select>
+  
+  <insert id="insert" parameterType="basket">
+        <!-- useGeneratedKeys="true" keyColumn="no" keyProperty="no"> -->
+    insert into oi_basket(amount,pno,uno)
+    values(#{amount},#{productNo},#{writer.userNo})
+  </insert>
+  
+  <delete id="delete" parameterType="int">
+    delete from oi_basket
+    where bkno=#{bkno}
+  </delete>
+  
+</mapper>
+
+
+
+
+
+

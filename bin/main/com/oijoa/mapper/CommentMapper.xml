@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.CommentDao">
+  
+  <resultMap type="comment" id="CommentMap">
+    <id column="cno"           property="commentNo"/>
+    <result column="rno"    property="recipeNo"/>
+    <result column="content"    property="content"/>
+    <result column="cdt"    property="createdDate"/>
+    <result column="mdt"    property="modifiedDate"/>
+   
+   <association property="writer" javaType="user">
+    <id column="writer_no"        property="userNo"/>
+    <result column="writer_nick"  property="nick"/>
+   </association>
+   
+  </resultMap>
+
+  <select id="findAll" resultMap="CommentMap" parameterType="string">
+    select 
+      cno,
+      uno,
+      rno,
+      content,
+      cdt,
+      mdt
+      from oi_comment
+     order by rno desc
+  </select>
+  
+    <select id="findByRecipeNo" resultMap="CommentMap" parameterType="int">
+    select
+      /*c.cno, 댓글수 counting할지 고민중*/
+      u.uno writer_no,
+      u.nick writer_nick,
+      c.content,
+      c.cdt,
+      c.mdt
+    from 
+      oi_comment c
+      inner join oi_user u on c.uno = u.uno
+    where 
+      c.rno = #{recipeNo}
+    order by
+      c.cdt desc  
+  </select>
+  
+   <select id="findByNo" resultMap="CommentMap" parameterType="int">
+    select
+      u.nick writer_nick,
+      c.content,
+      c.cdt,
+      c.mdt
+    from 
+      oi_comment c
+      inner join oi_user u on c.uno = u.uno
+    where 
+      c.rno = #{recipeNo}
+    order by
+      c.cdt desc  
+  </select>
+  
+  <select id="findByUserNo" resultMap="CommentMap" parameterType="int">
+	select
+	  content,
+	  cdt,
+	  rno
+	from
+ 	  oi_comment
+   	where
+   	  uno = #{writer.userNo}
+  </select>
+ 
+  
+  <insert id="insert" parameterType="comment">
+    insert into oi_comment(uno,rno,content) 
+    values(#{writer.userNo}, #{recipeNo}, #{content})
+  </insert>
+  
+  <update id="update" parameterType="comment">
+    update oi_comment 
+    <set>
+      <if test="comment_content != null">content = #{content},</if>
+       <if test="user.nick != null">writer_nick = #{user.nick},</if>
+       mdt=now()
+    </set>
+    where rno = #{recipeNo}
+  </update>
+  
+   <delete id="deleteByRecipeNo" parameterType="int">
+    delete from oi_comment
+    where rno=#{recipeNo}
+  </delete>
+  
+  
+  <insert id="create" parameterType="comment">
+    insert into oi_comment(uno,rno,content) 
+    values(#{writer.userNo}, #{recipeNo}, #{content})
+  </insert>
+  
+  <select id="listAsc" resultMap="CommentMap" parameterType="Integer">
+     select
+      u.uno writer_no,
+      u.nick writer_nick,
+      c.content,
+      c.cdt,
+      c.mdt,
+      c.cno
+    from 
+      oi_comment c
+      inner join oi_user u on c.uno = u.uno
+    where 
+      c.rno = #{recipeNo}
+    order by c.cdt
+  </select>
+  
+</mapper>
+
+
+
+
+
+

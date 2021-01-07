@@ -39,7 +39,7 @@ public class UserController {
     user.setNick(nick);
     user.setEmail(email);
     user.setPassword(password);
-    user.setPhoto("d10ea7f8-7df9-4eb7-a5d8-f7a3605197e8");
+    user.setPhoto("edda442c-5a56-4427-8c5e-5b052ca055ef");
 
     userService.add(user);
     return "redirect:../index";

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.KakaoPayDao">
+  
+  <resultMap type="kakaoPay" id="KakaoPayMap">
+    <id column="odno"           property="orderNo"/>
+    <result column="name"    property="name"/>
+    <result column="account"    property="account"/>
+    <result column="tdt"    property="transferedDate"/>
+    
+  </resultMap>
+
+  <select id="findAll" resultMap="KakaoPayMap" parameterType="string">
+    select 
+      odno,
+      name,
+      account,
+      tdt
+      from oi_kakaopay 
+  </select>
+  
+</mapper>
+
+
+
+
+
+

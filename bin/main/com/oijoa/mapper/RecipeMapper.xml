@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oijoa.dao.RecipeDao">
+  
+  <resultMap type="recipe" id="RecipeMap">
+    <id column="rno"           property="recipeNo"/>
+    <result column="title"  property="title"/>
+    <result column="content"  property="content"/>
+    <result column="photo"  property="photo"/>
+    <result column="hits"  property="hits"/>
+    <result column="rcmd"  property="recommendCount"/>
+    <result column="cdt"  property="createdDate"/>
+    <result column="mdt"  property="modifiedDate"/>
+    <result column="min"  property="min"/>
+    <result column="serving"  property="serving"/>
+    <result column="lno"  property="levelNo"/>
+    <result column="serving"  property="serving"/>
+    <result column="loginno" property="loginUserNo"/>
+    
+    <association property="writer" javaType="user">
+      <id column="writer_no"        property="userNo"/>
+      <result column="writer_nick"  property="nick"/>
+    </association>
+        
+    <association property="category" javaType="category">
+      <id column="category_no"  property="categoryNo"/>
+      <result column="category_name"     property="categoryName"/>
+    </association>
+  </resultMap>
+
+  <sql id='sql1'>
+   select 
+      r.rno,
+      r.title,
+      r.content,
+      r.photo,
+      r.min,
+      r.serving,
+      r.lno, 
+      u.uno writer_no,
+      u.nick writer_nick,
+      c.cno category_no,
+      c.name category_name,
+      r.cdt,
+      r.mdt, 
+      r.hits, 
+      r.rcmd,
+      r.serving
+    from 
+      oi_recipe r    
+      inner join oi_user u 
+         on r.uno=u.uno
+      inner join oi_recipe_category rc
+         on r.rno = rc.rno
+      inner join oi_category c
+         on rc.cno = c.cno
+   </sql>
+   
+   <select id="findAll" resultMap="RecipeMap">
+   <include refid="sql1"/>
+    order by r.rno desc
+  </select>
+  
+   <select id="findByHit" resultMap="RecipeMap">
+   <include refid="sql1"/>
+    order by hits desc
+  </select>
+
+  <select id="findByKeyword" resultMap="RecipeMap" parameterType="string">
+   <include refid="sql1"/>
+    <if test="keyword != null">
+    where
+      r.title like concat('%', #{keyword},'%')
+      or u.nick like concat('%', #{keyword},'%')
+      or c.name like concat('%', #{keyword},'%')    
+    </if>
+    order by r.rno desc
+  </select>
+  
+  <select id="findByDetailKeyword" resultMap="RecipeMap" parameterType="map">
+    <include refid="sql1"/>
+    <where>
+    <if test="title != null">
+    r.title like concat('%', #{title}, '%')
+    </if>
+    <if test="writer != null">
+    and u.nick like concat('%', #{writer}, '%')
+    </if>
+    <if test="category != null">    
+    and c.name like concat('%', #{category}, '%')
+    </if>
+    <if test="material != null">
+     and r.material like concat('%', #{material}, '%')
+    </if>
+    </where>
+    order by r.rno desc
+  </select>
+  
+  <select id="findByRecipeNo" resultMap="RecipeMap" parameterType="int">
+     <include refid="sql1"/>
+     where r.rno = #{recipeNo}
+  </select>
+  
+  <select id="findByUserNo" resultMap="RecipeMap" parameterType="int">
+    select 
+      rno,
+      title,
+      photo, 
+      cdt
+    from 
+      oi_recipe
+    where uno = #{loginNo}
+  </select>
+  
+
+  
+  <select id="findByLike" resultMap="RecipeMap" parameterType="int">
+    select 
+      r.rno,
+      r.title,
+      r.photo, 
+      r.cdt
+    from 
+      oi_board_like l
+      inner join oi_user u
+      on l.uno = u.uno
+      inner join oi_recipe r
+      on l.rno = r.rno
+    where l.uno = #{loginNo}
+  </select>
+
+  <insert id="insert" parameterType="recipe"
+  useGeneratedKeys="true" keyColumn="rno" keyProperty="recipeNo">
+    insert into oi_recipe(title,uno,content,min,lno,photo,serving)
+    values(#{title},#{writer.userNo},#{content},#{min},#{levelNo},#{photo},#{serving})
+  </insert>
+  
+  <insert id="insertCategory" parameterType="recipe">
+    insert into oi_recipe_category(rno,cno) 
+    values (#{recipeNo},#{category.categoryNo})
+  </insert>
+  
+  <insert id="insertRecipeMaterial" parameterType="recipe">
+    insert into oi_recipe_material(rno, mno)
+    values (#{recipeNo}, #{materialNo})
+   </insert>
+  
+  <select id="findRecipeMaterial" resultMap="RecipeMap" parameterType="int">
+    select 
+    /*레시피 번호(rno)와 재료번호(mno) 생략*/
+      case 
+        when (mno = 1) then '달걀'
+        when (mno = 2) then '사과'
+        when (mno = 3) then '양파'
+        when (mno = 4) then '돼지고기'
+        when (mno = 5) then '오징어'
+        when (mno = 6) then '배추'
+        when (mno = 7) then '고추'
+        when (mno = 8) then '닭고기'
+        when (mno = 9) then '소고기'
+        when (mno = 10) then '파'
+       end as material
+    from oi_recipe_material
+    where rno = #{rno}      
+  </select>
+  
+    <update id="update" parameterType="recipe">
+    update oi_recipe 
+    <set>
+      <if test="title != null">title = #{title},</if>
+      <if test="content != null">content = #{content},</if>
+      <if test="levelNo != null">lno = #{levelNo},</if>
+      <if test="min != null">min = #{min},</if>
+      <if test="serving != null">serving = #{serving},</if>
+      mdt=now()
+    </set>
+    where rno = #{recipeNo}
+  </update>
+  
+  <update id="updateCategory" parameterType="recipe">
+    update oi_recipe_category 
+    <set>
+      <if test="category.categoryNo != null">cno = #{category.categoryNo}</if>
+    </set>
+    where rno = #{recipeNo}
+  </update>
+  
+  <update id="updateHits" parameterType="int">
+    update oi_recipe set
+      hits = hits + 1
+    where rno = #{recipeNo}
+  </update>
+  
+   <update id="updateRecommendCount" parameterType="int">
+    update oi_recipe set
+      rcmd = rcmd + 1
+    where rno = #{recipeNo}
+  </update>
+    
+  <delete id="delete" parameterType="int">
+    delete from oi_recipe
+    where rno = #{recipeNo} 
+  </delete>
+  
+  <delete id="deleteRecipeCategory" parameterType="int">
+    delete from oi_recipe_category
+    where rno = #{recipeNo} 
+  </delete>
+  
+  <delete id="deleteRecipeMaterial" parameterType="int">
+    delete from oi_recipe_material
+    where rno = #{recipeNo} 
+  </delete>
+  
+     <select id="findLatelyRecipe" resultMap="RecipeMap" parameterType="int">
+   <include refid="sql1"/>
+  	where
+  		r.uno = #{uno}
+  	order by 
+  		cdt desc
+  	limit 0,1
+  </select>
+  
+   <select id="listByRecommendCount" resultMap="RecipeMap">
+   <include refid="sql1"/>
+    order by 
+      rcmd desc
+  </select>
+  
+   <select id="listByhits" resultMap="RecipeMap">
+   <include refid="sql1"/>
+    order by 
+      hits desc
+  </select>
+
+  
+</mapper>
+
+
+
+
+

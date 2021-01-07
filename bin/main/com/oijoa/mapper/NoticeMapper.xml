@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.NoticeDao">
+  
+  <resultMap type="notice" id="NoticeMap">
+    <id column="nono"           property="noticeNo"/>
+    <result column="title"    property="title"/>
+    <result column="content"    property="content"/>
+    <result column="rdt"    property="registeredDate"/>
+    
+    <association property="noticeType" javaType="noticeType">
+      <id column="ntno"    property="noticeTypeNo"/>
+      <result column="ntname"     property="name"/>
+    </association>
+  </resultMap>
+
+  <select id="findAll" resultMap="NoticeMap" parameterType="string">
+    select 
+      nono,
+      n.ntno,
+      nt.name ntname,
+      title,
+      content,
+      rdt
+      from oi_notice n
+      inner join oi_notice_type nt
+      on n.ntno = nt.ntno
+  </select>
+
+    <select id="findByNo" resultMap="NoticeMap" parameterType="int">
+    select 
+      nono,
+      n.ntno,
+      nt.name ntname,
+      title,
+      content,
+      rdt
+      from oi_notice n
+      inner join oi_notice_type nt
+      on n.ntno = nt.ntno
+      where
+      n.nono=#{nono}
+      order by nono asc
+  </select>
+  
+        <update id="update" parameterType="notice">
+    update oi_notice 
+    <set>
+      <if test="title != null">title = #{title},</if>
+      <if test="content != null">content = #{content},</if>
+      <if test="noticeType != null">ntno = #{noticeType.noticeTypeNo},</if>
+    </set>
+    where
+    ntno = #{noticeNo}
+  </update>
+  
+
+  <insert id="insert" parameterType="notice">
+    insert into oi_notice(ntno,title,content)
+    values(#{noticeType.noticeTypeNo},#{title},#{content})
+  </insert>
+  
+</mapper>
+
+
+
+
+
+

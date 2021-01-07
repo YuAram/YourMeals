@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.ReportTypeDao">
+  
+  <resultMap type="reportType" id="ReportTypeMap">
+    <id column="rtno"           property="reportTypeNo"/>
+    <result column="name"  property="reportTypename"/>
+  </resultMap>
+
+  <select id="findAll" resultMap="ReportTypeMap" parameterType="string">
+    select 
+      rtno,
+      name 
+    from 
+      oi_report_type
+  </select>
+  
+</mapper>
+
+
+
+
+
+

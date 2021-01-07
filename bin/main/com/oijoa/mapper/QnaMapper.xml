@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.QnADao">
+  
+  <resultMap type="qna" id="QnAMap">
+    <id column="qnano"           property="QnaNo"/>
+    <result column="secret"  property="secret"/>
+    <result column="title"  property="title"/>
+    <result column="content"  property="content"/>
+    <result column="cdt"  property="createdDate"/>
+    <result column="ansStat"  property="answerStatus"/>
+    <result column="answer"  property="answer"/>
+    <result column="adt"  property="answerDate"/>
+    
+    <association property="writer" javaType="user">
+      <id column="writer_uno"    property="userNo"/>
+    <result column="writer_name"  property="name"/>  
+    </association>
+  </resultMap>
+
+  <select id="findAll" resultMap="QnAMap" parameterType="string">
+    select 
+      q.qnano, 
+      q.title, 
+      q.cdt,
+      q.content,
+      u.uno writer_uno,
+      u.name writer_name,
+      answer,
+    if(isnull(answer), "답변대기중", "답변완료") 
+    as ansStat 
+    from oi_qna q
+    inner join oi_user u
+    on q.writer = u.uno
+  </select>
+  
+  <select id="findByNo" parameterType="int" resultMap="QnAMap">
+    select 
+      q.qnano, 
+      q.title, 
+      q.cdt,
+      q.content,
+      u.uno writer_uno,
+      u.name writer_name,
+      answer,
+    if(isnull(answer), "답변대기중", "답변완료") 
+    as ansStat 
+    from oi_qna q
+    inner join oi_user u
+    on q.writer = u.uno
+    where qnano = #{no}
+  </select>
+  
+  <select id="findByUserNo" resultMap="QnAMap" parameterType="int">
+    select 
+      q.qnano, 
+      q.title, 
+      q.cdt,
+      q.content,
+      u.uno writer_uno,
+      u.name writer_name,
+      answer,
+    if(isnull(answer), "답변대기중", "답변완료") 
+    as ansStat 
+    from oi_qna q
+    inner join oi_user u
+    on q.writer = u.uno
+    where u.uno = #{loginNo}
+  </select>
+  
+  <insert id="insert" parameterType="qna">
+    insert into oi_qna(writer,title,content,secret) 
+    values(#{writer.userNo}, #{title}, #{content}, 0)
+  </insert>
+  
+  <update id="update" parameterType="qna">
+    update oi_qna
+		<set>
+		<if test="title != null">title = #{title},</if>
+		<if test="content != null">content = #{content},</if>
+      <if test="answer != null">answer = #{answer}</if>
+    </set>
+    where qnano = #{QnaNo}
+  </update>
+  
+
+  <delete id="delete" parameterType="int">
+    delete from oi_qna 
+    where qnano=#{QnaNo}
+  </delete>
+</mapper>

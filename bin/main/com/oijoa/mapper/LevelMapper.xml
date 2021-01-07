@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.LevelDao">
+  
+  <resultMap type="level" id="LevelMap">
+    <id column="lno"           property="levelNo"/>
+    <result column="lv"    property="level"/>
+    
+  </resultMap>
+
+  <select id="findAll" resultMap="LevelMap" parameterType="string">
+    select 
+      lno,
+      lv
+      from oi_level
+  </select>
+  
+</mapper>
+
+
+
+
+
+

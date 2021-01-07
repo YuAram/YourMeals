@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.ReportDao">
+  
+  <resultMap type="report" id="ReportMap">
+    <id column="rpno"           property="reportNo"/>
+    <result column="reporter"  property="reporter"/>
+    <result column="attacker"  property="attacker"/>
+    <result column="rtno"  property="reprotTypeNo"/>
+    <result column="content"  property="content"/>
+    <result column="rdt"  property="registeredDate"/>
+    <result column="stat"  property="stat"/>
+  </resultMap>
+
+  <select id="findAll" resultMap="ReportMap" parameterType="string">
+    select 
+      rpno,
+      reporter,
+      attacker,
+      rtno,
+      content,
+      rdt,
+      stat 
+    from 
+      oi_report
+  </select>
+  
+</mapper>
+
+
+
+
+
+

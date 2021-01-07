@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.MaterialDao">
+  
+  <resultMap type="material" id="MaterialMap">
+    <id column="mno"           property="materialNo"/>
+    <result column="name"  property="name"/>
+  </resultMap>
+
+  <select id="findAll" resultMap="MaterialMap" parameterType="string">
+    select 
+     mno,
+     name 
+    from 
+      oi_material
+  </select>
+  
+  <insert id="insert" parameterType="int">
+    insert into oi_material (mno, name)
+      values (#{materialNo}, #{name})      
+  </insert>
+  
+</mapper>
+
+
+
+
+
+

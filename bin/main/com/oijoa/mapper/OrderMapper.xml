@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.OrderDao">
+  
+  <resultMap type="order" id="OrderMap">
+    <id column="odno"           property="orderNo"/>
+    <result column="pno"  property="paymentNo"/>
+    <result column="dcno"      property="deliveryCompanyNo"/>
+    <result column="postno"   property="postNo"/>
+    <result column="stat"   property="status"/>
+    <result column="memo"   property="memo"/>
+    <result column="odt"   property="orderDate"/>
+    <result column="addr"   property="address"/>
+    <result column="det_addr"   property="detailAddress"/>
+    <result column="tel"   property="tel"/>
+
+    <association property="userNo" javaType="user">
+      <id column="user_no"    property="userNo"/>
+      <result column="user_name"     property="name"/>
+    </association>
+    
+    <association property="basket" javaType="basket">
+      <id column="basket_no"    property="basketNo"/>
+      <association property="writer" javaType="user">
+        <id column="writer_no"        property="userNo"/> 
+        <result column="writer_name"  property="name"/>
+      </association>
+      <association property="product" javaType="product">
+      <id column="ol_product_no"            property="productNo"/>
+      <result column="product_title"   property ="title"/>
+        <result column="product_content"   property ="content"/>
+        <result column="product_photo"    property="photo"/>
+      </association>
+    </association>
+    
+    <collection property="baskets" ofType="basket">
+      <id column="baskets_no"          property="basketNo"/>
+      <result column="baskets_prno"    property="productNo"/>
+      <association property="product" javaType="product">
+      <id column="pno"     property="productNo"/>
+      <result column="product_title"   property="title"/>
+      <result column="product_content"    property="content"/>
+      <result column="product_photo"    property="photo"/>
+      </association>
+    </collection>
+    
+    <collection property="orderLists" ofType="orderlist">
+      <id column="orderLists_no"            property="orderListNo"/>
+      <result column="orderLists_amnt"      property="amount"/>
+      <result column="orderLists_dscnt"     property="discount"/>
+      <result column="orderLists_price"     property="price"/>
+      <association property="orderProduct"  javaType="product">
+        <id column="ol_product_no"            property="productNo"/>
+        <result column="ol_product_title"   property="title"/>
+        <result column="ol_product_content"   property="content"/>
+        <result column="ol_product_photo"	property="photo"/>
+      </association>
+    </collection>
+    
+  </resultMap>
+
+  <select id="findAll" resultMap="OrderMap" parameterType="string">
+  select
+      o.odno,
+      u.uno user_no,
+      u.name user_name,
+      b.bkno basket_no,
+      b.uno basket_user_no,
+      o.odt,
+      o.pno,
+      o.dcno,
+      o.tel,
+      o.transno,
+      o.memo,
+      o.postno,
+      o.addr,
+      o.det_addr,
+      o.stat
+    from
+      oi_order o
+      inner join oi_user u
+        on o.uno=u.uno
+      inner join oi_basket b 
+         on b.uno=o.uno
+  </select>
+  
+  <select id="findByUserNo" resultMap="OrderMap" parameterType="int">
+    select 
+      o.odno,
+      o.uno,
+      u.uno user_no,
+      u.name user_name,
+      b.bkno basket_no,
+      b.uno basket_user_no,
+      o.odt,
+      o.pno,
+      o.tel,
+      o.dcno,
+      o.transno,
+      o.memo,
+      o.postno,
+      o.addr,
+      o.det_addr,
+      o.stat
+    from
+      oi_order o
+      inner join oi_user u
+        on o.uno=u.uno
+      inner join oi_basket b 
+         on b.uno=o.uno
+    where o.uno = #{userNo.userNo}
+  </select>
+  
+<select id="descfindByOrderListUserNo" resultMap="OrderMap" parameterType="int">
+    select 
+      o.odno,
+      o.odt,
+      p.photo ol_product_photo,
+      p.title ol_product_title,
+      p.content ol_product_content,
+      ol.amount orderLists_amnt,
+      ol.price orderLists_price,
+      ol.discount orderLists_dscnt,
+      o.stat,
+      o.postno,
+      o.addr,
+      o.det_addr
+    from
+      oi_order o
+      left outer join oi_order_list ol
+        on o.odno=ol.odno
+      inner join oi_product p 
+         on ol.pno=p.pno
+    where o.uno = #{userNo.userNo}
+      and 10 > o.stat
+   	order by o.odt desc
+  </select>
+  
+    <select id="findByNo" resultMap="OrderMap" parameterType="int">
+    select 
+      o.odno,
+      o.uno,
+      u.uno user_no,
+      u.name user_name,
+      b.bkno basket_no,
+      b.uno basket_user_no,
+      o.odt,
+      o.pno,
+      o.dcno,
+      o.transno,
+      o.memo,
+      o.tel,
+      o.postno,
+      o.addr,
+      o.det_addr,
+      o.stat
+    from
+      oi_order o
+      inner join oi_user u
+        on o.uno=u.uno
+      inner join oi_basket b 
+         on b.uno=o.uno
+    where o.odno = #{odno}
+  </select>
+  
+  <select id="findByUpdateListUserNo" resultMap="OrderMap" parameterType="int">
+    select 
+      o.odt,
+      o.odno,
+      p.photo ol_product_photo,
+      p.title ol_product_title,
+      p.content ol_product_content,
+      ol.amount orderLists_amnt,
+      ol.price orderLists_price,
+      ol.discount orderLists_dscnt,
+      o.stat,
+      o.postno,
+      o.addr,
+      o.det_addr
+    from
+      oi_order o
+      left outer join oi_order_list ol
+        on o.odno=ol.odno
+      inner join oi_product p 
+         on ol.pno=p.pno
+    where o.uno = #{userNo.userNo}
+      and o.stat > 10
+  </select>
+  
+   <select id="findByOrderListUserNo" resultMap="OrderMap" parameterType="int">
+    select 
+      o.odno,
+      o.odt,
+      p.photo ol_product_photo,
+      p.title ol_product_title,
+      p.content ol_product_content,
+      ol.amount orderLists_amnt,
+      ol.price orderLists_price,
+      ol.discount orderLists_dscnt,
+      o.stat,
+      o.tel,
+      o.postno,
+      o.addr,
+      o.det_addr
+    from
+      oi_order o
+      left outer join oi_order_list ol
+        on o.odno=ol.odno
+      inner join oi_product p 
+         on ol.pno=p.pno
+    where o.uno = #{userNo.userNo}
+      and 10 > o.stat
+  </select>
+  
+  <select id="findByOrderShippingListUserNo" resultMap="OrderMap" parameterType="int">
+    select 
+      o.odno,
+      o.odt,
+      p.photo ol_product_photo,
+      p.title ol_product_title,
+      p.content ol_product_content,
+      ol.amount orderLists_amnt,
+      ol.price orderLists_price,
+      ol.discount orderLists_dscnt,
+      o.stat,
+      o.tel,
+      o.postno,
+      o.addr,
+      o.det_addr
+    from
+      oi_order o
+      left outer join oi_order_list ol
+        on o.odno=ol.odno
+      inner join oi_product p 
+         on ol.pno=p.pno
+    where o.uno = #{userNo.userNo}
+      and o.stat = 3
+  </select>
+  
+  <select id="findLatelyOrder" resultMap="OrderMap" parameterType="int">
+  	select
+  		o.odno,
+  		o.pno,
+  		u.uno user_no,
+      u.name user_name,
+  		o.dcno,
+  		o.postno,
+  		o.stat,
+  		o.memo,
+  		o.odt,
+  		o.tel,
+  		o.addr,
+  		o.det_addr
+  	from
+  		oi_order o
+  	inner join oi_user u
+      on o.uno=u.uno
+  	where
+  		o.uno = #{uno}
+  	order by 
+  		odt desc
+  	limit 0,1
+  </select>
+  
+      <update id="update" parameterType="order">
+    update oi_order 
+    <set>
+      <if test="postNo != null">postno = #{postNo},</if>
+      <if test="address != null">addr = #{address},</if>
+      <if test="detailAddress != null">det_addr = #{detailAddress},</if>
+      <if test="tel != null">tel = #{tel},</if>
+      <if test="status != null">stat = #{status}</if>
+    </set>
+    where
+    odno = #{orderNo}
+  </update>
+  
+
+  
+  <insert id="insert" parameterType="order"> 
+    insert into oi_order(uno,pno,dcno,transno,memo,tel,postno,addr,det_addr)
+    values(#{userNo.userNo},#{paymentNo},#{deliveryCompanyNo},
+           #{transportNo},#{memo},#{tel},#{postNo},#{address},#{detailAddress})
+  </insert>
+  
+  <insert id="insertList" parameterType="orderList">
+    insert into oi_order_list(odno,pno,amount,discount,price)
+    values(#{orderNo.orderNo},#{orderProduct.productNo},#{amount},#{discount},#{price})
+  </insert>
+  
+</mapper>

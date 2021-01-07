@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.FollowDao">
+  
+  <resultMap type="follow" id="FollowMap">
+    <result column="follower"           property="follower"/>
+    <result column="following"    property="following"/>
+    <result column="loginNo" property="loginUserNo"/>
+    
+    <association property="user" javaType="user">
+      <id column="user_no"        property="userNo"/>
+      <id column="user_name"        property="name"/>
+      <result column="user_nick"  property="nick"/>
+      <result column="user_photo"  property="photo"/>
+    </association>
+    
+    <!-- 
+    <association property="writer" javaType="member">
+      <id column="writer_no"    property="no"/>
+      <result column="name"     property="name"/>
+    </association> -->
+  </resultMap>
+
+  <select id="findAll" resultMap="FollowMap" parameterType="string">
+    select 
+      follower,
+      following
+      from oi_follow
+  </select>
+  
+  <select id="findByFollowerUserNo" resultMap="FollowMap"
+    parameterType="int">
+    select
+      u.uno user_no,
+      u.name user_name,
+      u.nick user_nick,
+      u.photo user_photo
+    from
+      oi_follow f
+      inner join oi_user u
+      on f.follower = u.uno
+    where
+      f.following = #{loginNo}
+    order by user_no asc
+  </select>
+  
+  <select id="findByFollowingUserNo" resultMap="FollowMap"
+    parameterType="int">
+    select 
+      u.uno user_no,
+      u.name user_name,
+      u.nick user_nick,
+      u.photo user_photo
+    from
+      oi_follow f
+      inner join oi_user u
+      on f.following = u.uno
+    where   
+      f.follower = #{loginNo}
+    order by user_no asc
+  </select>
+  
+  <insert id="insert" parameterType="follow">
+    insert into oi_follow(follower, following) 
+    values(#{follower},#{following})
+  </insert>
+  
+  <delete id="delete" parameterType="follow">
+    delete from oi_follow
+    where 
+      follower = #{follower}
+      and following = #{following}
+  </delete>
+  
+  <select id="findByFollowCount" resultType="int" parameterType="follow">
+    select 
+      count(*)
+    from 
+      oi_follow
+    where 
+      follower = #{follower}
+      and following = #{following};
+  </select>
+</mapper>
+
+
+
+
+
+

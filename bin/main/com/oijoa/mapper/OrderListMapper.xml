@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.OrderListDao">
+  
+  <resultMap type="orderList" id="OrderListMap">
+    <id column="olno"           property="orderListNo"/>
+    <result column="amount"      property="amount"/>
+    <result column="discount"   property="discount"/>
+    <result column="price"   property="price"/>
+    
+    <association property="orderNo" javaType="order">
+      <id column="order_no"         property="orderNo"/>
+      <association property="userNo" javaType="user">
+        <id column="user_no"        property="userNo"/>
+        <result column="user_name"  property="name"/>      
+      </association>
+    </association>
+    
+    <association property="orderProduct" javaType="product">
+      <id column="product_no"          property="productNo"/>
+      <result column="product_title"    property="title"/>
+      <result column="product_content"    property="content"/>
+      <result column="product_photo"	property="photo"/>
+      
+    </association>
+  </resultMap>
+
+  <select id="findAll" resultMap="OrderListMap" parameterType="string">
+    select 
+      olno, 
+      odno, 
+      pno, 
+      amount, 
+      discount,
+      price
+      from oi_order_list
+  </select>
+  
+  <select id="findByOrderNo" resultMap="OrderListMap" parameterType="int">
+  	select
+  		ol.olno,
+  		ol.pno,
+  		p.pno product_no,
+      p.title product_title,
+  		p.content product_content,
+  		p.photo product_photo,
+  		ol.amount,
+  		ol.discount,
+  		ol.price
+	 	from
+		  oi_order_list ol
+  		inner join oi_product p
+    		on ol.pno=p.pno
+   		inner join oi_order o 
+      on ol.odno=o.odno
+    where
+    	ol.odno=#{odno}  
+    
+  </select>
+  
+  <select id="findByUserNo" resultMap="OrderListMap" parameterType="int">
+    select 
+      ol.olno,
+      ol.pno,
+      p.pno product_no,
+      p.title product_title,
+      p.content product_content,
+      p.photo product_photo,
+      o.odno order_no,
+      o.uno user_no,
+      u.uno user_no,
+      u.name user_name,
+      ol.amount,
+      ol.discount,
+      ol.price
+    from
+      oi_order_list ol
+      inner join oi_product p
+        on ol.pno=p.pno
+      inner join oi_order o 
+         on ol.odno=o.odno
+      inner join oi_user u
+        on o.uno=u.uno
+    where o.uno = #{userNo.userNo}
+  </select>
+  
+  
+  <select id="makeList" resultMap="OrderListMap" parameterType="int">
+  	select
+  		u.uno user_no,
+  		u.name user_name,
+  		p.pno product_no,
+      p.title product_title,
+  		p.content product_content,
+  		p.photo product_photo,
+  		b.amount,
+  		p.discount,
+  		p.price
+  	from oi_basket b
+  		inner join oi_user u
+  			on b.uno = u.uno
+  		inner join oi_product p
+  			on b.pno = p.pno
+  	where b.uno=#{userNo};
+  </select>
+  
+  <select id="">
+  
+  </select>
+  
+</mapper>
+
+
+
+
+
+

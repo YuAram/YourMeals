@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.oijoa.dao.ProductDao">
+  
+  <resultMap type="product" id="ProductMap">
+    <id column="pno"           property="productNo"/>
+    <result column="title"  property="title"/>
+    <result column="stock"  property="stock"/>
+    <result column="price"      property="price"/>
+    <result column="discount"   property="discount"/>
+    <result column="content"   property="content"/>
+    <result column="photo"   property="photo"/>
+  </resultMap>
+
+  <select id="findAll" resultMap="ProductMap" parameterType="string">
+    select 
+      pno,
+      title,
+      stock,
+      price,
+      discount,
+      content,
+      photo
+    from 
+      oi_product
+  </select>
+  
+  <select id="findByNo" resultMap="ProductMap" parameterType="int">
+    select 
+      pno,
+      title,
+      stock,
+      price,
+      discount,
+      content,
+      photo
+    from 
+      oi_product
+    where
+    	pno=#{pno}  
+  </select>
+  
+  <insert id="insert" parameterType="product">
+  insert into oi_product(title,stock,price,discount,content,photo)
+  values(#{title}, #{stock}, #{price}, #{discount}, #{content}, #{photo})
+  </insert>
+  
+    <update id="update" parameterType="product">
+    update oi_product 
+    <set>
+      <if test="title != null">title = #{title},</if>
+      <if test="content != null">content = #{content},</if>
+      <if test="stock != null">stock = #{stock},</if>
+      <if test="discount != null">discount = #{discount}</if>
+    </set>
+    where
+    pno = #{productNo}
+  </update>
+  
+</mapper>
+
+
+
+
+
+
