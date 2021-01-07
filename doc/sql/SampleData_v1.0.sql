@@ -52,6 +52,41 @@ insert into oi_follow(follower, following) values (7 ,10);
 insert into oi_follow(follower, following) values (8 ,10);
 insert into oi_follow(follower, following) values (9 ,10);
 
+-- 공지사항분류
+insert into oi_notice_type(ntno, name) values (1, '필독');
+insert into oi_notice_type(ntno, name) values (2, '공지');
+
+-- 요리유형
+insert into oi_category(cno, name) values (1, '메인요리');
+insert into oi_category(cno, name) values (2, '밑반찬');
+insert into oi_category(cno, name) values (3, '국/찌개');
+insert into oi_category(cno, name) values (4, '면/만두');
+insert into oi_category(cno, name) values (5, '밥/죽/떡');
+insert into oi_category(cno, name) values (6, '김치/젓갈');
+insert into oi_category(cno, name) values (7, '양념/소스');
+insert into oi_category(cno, name) values (8, '디저트');
+insert into oi_category(cno, name) values (9, '빵/과자');
+insert into oi_category(cno, name) values (10, '스프');
+insert into oi_category(cno, name) values (11, '샐러드');
+insert into oi_category(cno, name) values (12, '기타');
+
+-- 난이도번호
+insert into oi_level(lno, lv) values (1, 1);
+insert into oi_level(lno, lv) values (2, 2);
+insert into oi_level(lno, lv) values (3, 3);
+insert into oi_level(lno, lv) values (4, 4);
+insert into oi_level(lno, lv) values (5, 5);
+
+-- 결제방법
+insert into oi_payment(pno, name) values (1, 'accoTransfer');
+insert into oi_payment(pno, name) values (2, 'kakaopay');
+
+-- 배송사 
+insert into oi_delivery_company(dcno, name) values (1, 'postOffice');
+insert into oi_delivery_company(dcno, name) values (2, 'hanjin');
+insert into oi_delivery_company(dcno, name) values (3, 'CJ');
+insert into oi_delivery_company(dcno, name) values (4, 'postOffice');
+
 -- 전체조회(25)
 select * from oi_qna;
 select * from oi_payment;
